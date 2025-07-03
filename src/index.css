@@ -2,37 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply bg-beige text-primary-700 font-sans;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow hover:shadow-lg;
   }
-  
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-all duration-200 shadow-sm hover:shadow-md;
+    @apply bg-beige hover:bg-primary-50 text-primary-700 font-medium py-2 px-4 rounded-lg border border-primary-200 transition-all duration-200 shadow-sm hover:shadow-md;
   }
-  
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    @apply w-full px-3 py-2 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-beige text-primary-700;
   }
-  
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all duration-200 hover:shadow-md;
+    @apply bg-white rounded-xl shadow border border-primary-100 p-6 transition-all duration-200 hover:shadow-lg;
   }
-  
   .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in;
+    @apply fixed inset-0 bg-primary-700 bg-opacity-50 flex items-center justify-center p-4 z-50;
   }
-  
   .modal-content {
-    @apply bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-up;
+    @apply bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto;
+  }
+  /* Utility for header layout to prevent overlap */
+  .header-stack {
+    @apply flex flex-col items-start gap-y-2 md:gap-y-4;
+  }
+  .header-title-animated {
+    margin-bottom: 2.5rem;
+    width: 100%;
+  }
+  .header-tagline {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: #1e293b;
   }
 }
 
@@ -40,14 +48,26 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 @keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px);}
+  to   { opacity: 1; transform: translateY(0);}
+}
+
+/* Clamp confession text to 4 lines, expand vertically */
+.confession-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  transition: max-height 0.3s;
+  max-height: 7.5em;
+  word-break: break-word;
+}
+.confession-description.expanded {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  max-height: 1000em;
+  overflow: visible;
 }

@@ -9,10 +9,8 @@ interface ConfessionCardProps {
 const ConfessionCard: React.FC<ConfessionCardProps> = ({ confession }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // If audio, don't show text truncation/read more
   const hasAudio = Boolean((confession as any).audio_url || (confession as any).audio_path);
 
-  // Only check truncation for text
   const shouldTruncate =
     !hasAudio && confession.description && confession.description.length > 200;
 
@@ -40,7 +38,7 @@ const ConfessionCard: React.FC<ConfessionCardProps> = ({ confession }) => {
   };
 
   return (
-    <div className="card hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary-500">
+    <div className="card hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary-500 flex flex-col">
       <div className="flex justify-between items-start mb-4">
         <div className="flex flex-wrap gap-4 text-sm text-gray-600">
           <span className="flex items-center bg-gray-100 px-3 py-1 rounded-full">
@@ -66,33 +64,31 @@ const ConfessionCard: React.FC<ConfessionCardProps> = ({ confession }) => {
         </span>
       </div>
 
-      <div className="text-gray-800 leading-relaxed">
-        {/* If audio_url or audio_path, show audio player */}
+      <div className="text-gray-800 leading-relaxed flex-1">
         {(confession as any).audio_url || (confession as any).audio_path ? (
           <audio
             controls
-            // src={
-            //   (confession as any).audio_url
-            //     ? (confession as any).audio_url
-            //     : `${(confession as any).audio_path}`
-            // }
-            src = {`C:\Users\shlok\confession-platform\backend/1751459943881-confession.webm`}
+            src={
+              (confession as any).audio_url
+                ? (confession as any).audio_url
+                : `${(confession as any).audio_path}`
+            }
             className="w-full mt-2"
           >
             Your browser does not support the audio element.
           </audio>
         ) : (
-          <p className="whitespace-pre-wrap text-base">
-            {isExpanded || !shouldTruncate
-              ? confession.description
-              : truncateText(confession.description, 200)}
+          <p
+            className={`confession-description text-base ${isExpanded ? "expanded" : ""}`}
+          >
+            {confession.description}
           </p>
         )}
       </div>
 
       {/* Only show Read More for text confessions */}
       {!hasAudio && shouldTruncate && (
-        <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-primary-600 hover:text-primary-700 font-medium text-sm focus:outline-none transition-colors duration-200"

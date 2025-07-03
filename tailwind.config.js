@@ -7,11 +7,17 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          50: '#f0f9ff',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          50:  '#e8edfa',
+          100: '#c7d6f6',
+          200: '#a3bdf0',
+          300: '#7fa3ea',
+          400: '#5d8ae5',
+          500: '#2563eb',   // Main blue
+          600: '#1e40ag',   // Accent blue
+          700: '#1e293b',   // Very dark blue
         },
+        beige: '#f5f5dc',
+        // You can keep your secondary palette if you want more shades
         secondary: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -26,11 +32,21 @@ module.exports = {
         }
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        }
       }
     },
   },
