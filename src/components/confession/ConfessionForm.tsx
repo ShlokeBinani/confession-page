@@ -52,8 +52,8 @@ const ConfessionForm: React.FC<ConfessionFormProps> = ({
         newErrors.description = 'Confession is required';
       } else if (formData.description.trim().length < 10) {
         newErrors.description = 'Confession must be at least 10 characters';
-      } else if (formData.description.trim().length > 1000) {
-        newErrors.description = 'Confession must be less than 1000 characters';
+      } else if (formData.description.trim().length > 5000) {
+        newErrors.description = 'Confession must be less than 5000 characters';
       }
     } else {
       if (!audioBlob) {
@@ -210,12 +210,12 @@ const ConfessionForm: React.FC<ConfessionFormProps> = ({
                     rows={5}
                     className={`input-field resize-none ${errors.description ? 'border-red-500 focus:ring-red-500' : ''}`}
                     placeholder="Share your confession anonymously... What's on your mind?"
-                    maxLength={1000}
+                    maxLength={5000}
                   />
                   <div className="flex justify-between items-center mt-2">
                     {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
                     <p className="text-gray-500 text-sm ml-auto">
-                      {formData.description.length}/1000
+                      {formData.description.length}/5000
                     </p>
                   </div>
                 </div>
