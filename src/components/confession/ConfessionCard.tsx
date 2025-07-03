@@ -11,6 +11,11 @@ const ConfessionCard: React.FC<ConfessionCardProps> = ({ confession }) => {
 
   const hasAudio = Boolean((confession as any).audio_url || (confession as any).audio_path);
 
+  const audioPath = `C:/Users/shlok/confession-platform/backend/1751479010079-confession.webm`
+
+  // const path = `{C:\Users\shlok\confession-platform\backend\1751459943881-confession.webm`
+  const path = "C:\\Users\\shlok\\confession-platform\\backend\\1751459943881-confession.webm";
+const fileUrl2 = `${path.replace(/\\/g, '/')}`;
   const shouldTruncate =
     !hasAudio && confession.description && confession.description.length > 200;
 
@@ -63,16 +68,20 @@ const ConfessionCard: React.FC<ConfessionCardProps> = ({ confession }) => {
           {formatDate(confession.created_at)}
         </span>
       </div>
-
+        lkjashflkh
+        <div className="">
+          {(confession as any).audio_url  }
+        </div>
       <div className="text-gray-800 leading-relaxed flex-1">
         {(confession as any).audio_url || (confession as any).audio_path ? (
           <audio
             controls
-            src={
-              (confession as any).audio_url
-                ? (confession as any).audio_url
-                : `${(confession as any).audio_path}`
-            }
+            src=
+              // (confession as any).audio_url
+              //   ? (confession as any).audio_url
+              //   : `${(confession as any).audio_path}`
+              {fileUrl2}
+            
             className="w-full mt-2"
           >
             Your browser does not support the audio element.

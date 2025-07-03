@@ -6,7 +6,7 @@ interface ConfessionFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: FormData | ConfessionFormData) => Promise<void>;
-  isLoading?: boolean; // This prop is now ignored in favor of local state
+  isLoading?: boolean;
 }
 
 const ConfessionForm: React.FC<ConfessionFormProps> = ({
@@ -105,8 +105,8 @@ const ConfessionForm: React.FC<ConfessionFormProps> = ({
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="p-6">
+      <div className="modal-content overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="flex-1 overflow-y-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Share Your Confession</h2>
             <button
@@ -186,7 +186,7 @@ const ConfessionForm: React.FC<ConfessionFormProps> = ({
                 </label>
                 <button
                   type="button"
-                  className="ml-4 px-3 py-1 rounded bg-gray-200 text-gray-700 text-xs"
+                  className="ml-4 px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs transition"
                   onClick={() => setUseVoice(v => !v)}
                 >
                   {useVoice ? 'Type Instead' : 'Record Voice'}
