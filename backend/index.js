@@ -3,151 +3,74 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs'); // Added fs for file checking
+const fs = require('fs');
 const pool = require('./db');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Multer setup to save in the root directory
+// Files save in the root directory on Render
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, process.cwd()), 
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
 
-// GET with filters, search, sort, and pagination
+// GET Confessions - This creates the correct WEB LINK
 app.get('/api/confessions', async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      city,
-      sex,
-      ageMin,
-      ageMax,
-      search,
-      sortBy = 'created_at',
-      sortOrder = 'desc'
-    } = req.query;
-
-    let whereClause = 'WHERE 1=1';
-    const values = [];
-    let idx = 1;
-
-    if (city) {
-      whereClause += ` AND LOWER(city) LIKE LOWER($${idx++})`;
-      values.push(`%${city}%`);
-    }
-    if (sex) {
-      whereClause += ` AND sex = $${idx++}`;
-      values.push(sex);
-    }
-    if (ageMin) {
-      whereClause += ` AND age >= $${idx++}`;
-      values.push(Number(ageMin));
-    }
-    if (ageMax) {
-      whereClause += ` AND age <= $${idx++}`;
-      values.push(Number(ageMax));
-    }
-    if (search) {
-      whereClause += ` AND (LOWER(description) LIKE LOWER($${idx}) OR LOWER(city) LIKE LOWER($${idx + 1}))`;
-      values.push(`%${search}%`, `%${search}%`);
-      idx += 2;
-    }
-
-    const countQuery = `SELECT COUNT(*) FROM confessions ${whereClause}`;
-    const countResult = await pool.query(countQuery, values);
-    const total = Number(countResult.rows[0].count);
-
+    const { page = 1, limit = 10 } = req.query;
     const offset = (Number(page) - 1) * Number(limit);
-    const orderField = ['city', 'sex', 'age', 'created_at'].includes(sortBy) ? sortBy : 'created_at';
-    const orderDirection = sortOrder === 'asc' ? 'ASC' : 'DESC';
 
-    const dataQuery = `
-      SELECT * FROM confessions
-      ${whereClause}
-      ORDER BY ${orderField} ${orderDirection}
-      LIMIT $${idx++} OFFSET $${idx++}
-    `;
-    values.push(Number(limit), offset);
+    const dataResult = await pool.query(
+      'SELECT * FROM confessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+      [Number(limit), offset]
+    );
 
-    const dataResult = await pool.query(dataQuery, values);
-
-    // FIX: Use /api/file/ route and ensure only filename is used
     const confessions = dataResult.rows.map(confession => {
       if (confession.audio_path) {
         return {
           ...confession,
+          // This creates a link like https://your-backend.com/api/file/filename.webm
           audio_url: `${req.protocol}://${req.get('host')}/api/file/${confession.audio_path}`
         };
       }
       return confession;
     });
 
-    res.json({
-      confessions,
-      totalPages: Math.ceil(total / Number(limit)),
-      currentPage: Number(page),
-      total
-    });
+    res.json({ confessions });
   } catch (err) {
-    console.error('GET /api/confessions error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST audio or text confession
+// POST Confessions - This saves ONLY the filename
 app.post('/api/confessions', upload.single('audio'), async (req, res) => {
   const { city, sex, age, description } = req.body;
   const audioFile = req.file;
 
   try {
-    let result;
-    if (audioFile) {
-      const safeDesc = description || '';
-      // FIX: Save audioFile.filename instead of audioFile.path
-      result = await pool.query(
-        `INSERT INTO confessions
-         (city, sex, age, description, audio_path)
-         VALUES ($1,$2,$3,$4,$5)
-         RETURNING *`,
-        [city, sex, age, safeDesc, audioFile.filename]
-      );
-    } else {
-      result = await pool.query(
-        `INSERT INTO confessions
-         (city, sex, age, description)
-         VALUES ($1,$2,$3,$4)
-         RETURNING *`,
-        [city, sex, age, description]
-      );
-    }
+    const result = await pool.query(
+      `INSERT INTO confessions (city, sex, age, description, audio_path)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [city, sex, age, description || '', audioFile ? audioFile.filename : null]
+    );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error('POST /api/confessions error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Route to serve files
-app.get('/api/file/:filename', async (req, res) => {
-  const { filename } = req.params;
-
-  if (filename.includes('/') || filename.includes('\\')) {
-    return res.status(400).json({ error: 'Invalid filename' });
+// Serve the actual audio files
+app.get('/api/file/:filename', (req, res) => {
+  const filePath = path.join(process.cwd(), req.params.filename);
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('File not found');
   }
-
-  const filePath = path.join(process.cwd(), filename);
-
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'File not found' });
-  }
-
-  res.sendFile(filePath);
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server on ${PORT}`));
