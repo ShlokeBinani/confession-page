@@ -33,7 +33,7 @@ app.get('/api/confessions', async (req, res) => {
         return {
           ...confession,
           // This creates a link like https://your-backend.com/api/file/filename.webm
-          audio_url: `${req.protocol}://${req.get('host')}/api/file/${confession.audio_path}`
+          audio_url: `https://${req.get('host')}/api/file/${confession.audio_path}`
         };
       }
       return confession;
