@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Confession } from '../../types';
-import { formatDate, truncateText } from '../../utils/helpers';
+import { formatDate } from '../../utils/helpers';
 
 interface ConfessionCardProps {
   confession: Confession;
@@ -11,7 +11,7 @@ const ConfessionCard: React.FC<ConfessionCardProps> = ({ confession }) => {
 
   const hasAudio = Boolean((confession as any).audio_url || (confession as any).audio_path);
 
-  const audioPath = `C:/Users/shlok/confession-platform/backend/1751479010079-confession.webm`
+  //const audioPath = `C:/Users/shlok/confession-platform/backend/1751479010079-confession.webm`
 
   // const path = `{C:\Users\shlok\confession-platform\backend\1751459943881-confession.webm`
   const path = "C:\\Users\\shlok\\confession-platform\\backend\\1751459943881-confession.webm";
