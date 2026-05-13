@@ -3,29 +3,23 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs'); // Added fs for file checking
 const pool = require('./db');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// // Multer setup
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => cb(null, 'uploads/'),
-//   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-// });
-// const upload = multer({ storage });
-
+// Multer setup to save in the root directory
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, process.cwd()), // Save in root directory
+  destination: (req, file, cb) => cb(null, process.cwd()), 
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
 
-// GET with filters, search, sort, and pagination...
+// GET with filters, search, sort, and pagination
 app.get('/api/confessions', async (req, res) => {
-   try {
+  try {
     const {
       page = 1,
       limit = 10,
@@ -82,12 +76,12 @@ app.get('/api/confessions', async (req, res) => {
 
     const dataResult = await pool.query(dataQuery, values);
 
-    // Prepend full URL to audio_path for frontend playback
+    // FIX: Use /api/file/ route and ensure only filename is used
     const confessions = dataResult.rows.map(confession => {
       if (confession.audio_path) {
         return {
           ...confession,
-          audio_url: `${req.protocol}://${req.get('host')}/uploads/${confession.audio_path}`
+          audio_url: `${req.protocol}://${req.get('host')}/api/file/${confession.audio_path}`
         };
       }
       return confession;
@@ -107,24 +101,20 @@ app.get('/api/confessions', async (req, res) => {
 
 // POST audio or text confession
 app.post('/api/confessions', upload.single('audio'), async (req, res) => {
-  console.log('POST /api/confessions');
-  console.log('BODY:', req.body);
-  console.log('FILE:', req.file);
-
   const { city, sex, age, description } = req.body;
   const audioFile = req.file;
 
   try {
     let result;
     if (audioFile) {
-      // Ensure description is never NULL
       const safeDesc = description || '';
+      // FIX: Save audioFile.filename instead of audioFile.path
       result = await pool.query(
         `INSERT INTO confessions
          (city, sex, age, description, audio_path)
          VALUES ($1,$2,$3,$4,$5)
          RETURNING *`,
-        [city, sex, age, safeDesc, audioFile.path]
+        [city, sex, age, safeDesc, audioFile.filename]
       );
     } else {
       result = await pool.query(
@@ -141,22 +131,21 @@ app.post('/api/confessions', upload.single('audio'), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Route to serve files
 app.get('/api/file/:filename', async (req, res) => {
   const { filename } = req.params;
 
-  // Prevent directory traversal attacks
   if (filename.includes('/') || filename.includes('\\')) {
     return res.status(400).json({ error: 'Invalid filename' });
   }
 
   const filePath = path.join(process.cwd(), filename);
 
-  // Check if file exists
   if (!fs.existsSync(filePath)) {
     return res.status(404).json({ error: 'File not found' });
   }
 
-  // Optionally set correct Content-Type for audio/webm, mp3, etc.
   res.sendFile(filePath);
 });
 
