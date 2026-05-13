@@ -11,11 +11,6 @@ const ConfessionCard: React.FC<ConfessionCardProps> = ({ confession }) => {
 
   const hasAudio = Boolean((confession as any).audio_url || (confession as any).audio_path);
 
-  //const audioPath = `C:/Users/shlok/confession-platform/backend/1751479010079-confession.webm`
-
-  // const path = `{C:\Users\shlok\confession-platform\backend\1751459943881-confession.webm`
-  const path = "C:\\Users\\shlok\\confession-platform\\backend\\1751459943881-confession.webm";
-const fileUrl2 = `${path.replace(/\\/g, '/')}`;
   const shouldTruncate =
     !hasAudio && confession.description && confession.description.length > 200;
 
@@ -24,19 +19,19 @@ const fileUrl2 = `${path.replace(/\\/g, '/')}`;
       case 'Male':
         return (
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 13a2 2 0 114 0 2 2 0 01-4 0z"/>
+            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 13a2 2 0 114 0 2 2 0 01-4 0z" />
           </svg>
         );
       case 'Female':
         return (
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 13a2 2 0 114 0 2 2 0 01-4 0z"/>
+            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 13a2 2 0 114 0 2 2 0 01-4 0z" />
           </svg>
         );
       default:
         return (
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 13a2 2 0 114 0 2 2 0 01-4 0z"/>
+            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 13a2 2 0 114 0 2 2 0 01-4 0z" />
           </svg>
         );
     }
@@ -68,20 +63,12 @@ const fileUrl2 = `${path.replace(/\\/g, '/')}`;
           {formatDate(confession.created_at)}
         </span>
       </div>
-        lkjashflkh
-        <div className="">
-          {(confession as any).audio_url  }
-        </div>
+
       <div className="text-gray-800 leading-relaxed flex-1">
         {(confession as any).audio_url || (confession as any).audio_path ? (
           <audio
             controls
-            src=
-              // (confession as any).audio_url
-              //   ? (confession as any).audio_url
-              //   : `${(confession as any).audio_path}`
-              {fileUrl2}
-            
+            src={(confession as any).audio_url}
             className="w-full mt-2"
           >
             Your browser does not support the audio element.
